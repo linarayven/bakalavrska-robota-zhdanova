@@ -5,6 +5,7 @@ import { DEFAULT_CATEGORIES } from "./model";
 const STORAGE_KEY = "stp.tasks";
 const CATEGORIES_KEY = "stp.categories";
 const THEME_KEY = "stp.theme";
+const LANGUAGE_KEY = "stp.language";
 
 function loadTasks(): Task[] {
   try {
@@ -38,14 +39,78 @@ function loadTasks(): Task[] {
 function seedTasks(): Task[] {
   const today = new Date();
   const iso = (d: Date) => d.toISOString().slice(0, 10);
-  const plus = (n: number) => { const d = new Date(today); d.setDate(d.getDate() + n); return iso(d); };
+  const plus = (n: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + n);
+    return iso(d);
+  };
   return [
-    { id: 1, title: "Read chapter 4 — Linear Algebra", priority: "high", issueType: "Task", status: "in progress", completed: false, dueDate: iso(today), categoryId: "study", createdAt: Date.now() - 10000 },
-    { id: 2, title: "Submit UX assignment", priority: "high", issueType: "Task", status: "to do", completed: false, dueDate: plus(1), categoryId: "study", createdAt: Date.now() - 9000 },
-    { id: 3, title: "Gym session", priority: "low", issueType: "Task", status: "to do", completed: false, dueDate: iso(today), categoryId: "personal", createdAt: Date.now() - 8000 },
-    { id: 4, title: "Sketch landing page idea", priority: "medium", issueType: "Story", status: "to do", completed: false, dueDate: plus(2), categoryId: "ideas", createdAt: Date.now() - 7000 },
-    { id: 5, title: "Email professor about thesis", priority: "medium", issueType: "Task", status: "done", completed: true, dueDate: plus(-1), categoryId: "study", createdAt: Date.now() - 6000 },
-    { id: 6, title: "Plan weekend trip", priority: "low", issueType: "Task", status: "to do", completed: false, dueDate: plus(4), categoryId: "personal", createdAt: Date.now() - 5000 },
+    {
+      id: 1,
+      title: "Read chapter 4 — Linear Algebra",
+      priority: "high",
+      issueType: "Task",
+      status: "in progress",
+      completed: false,
+      dueDate: iso(today),
+      categoryId: "study",
+      createdAt: Date.now() - 10000,
+    },
+    {
+      id: 2,
+      title: "Submit UX assignment",
+      priority: "high",
+      issueType: "Task",
+      status: "to do",
+      completed: false,
+      dueDate: plus(1),
+      categoryId: "study",
+      createdAt: Date.now() - 9000,
+    },
+    {
+      id: 3,
+      title: "Gym session",
+      priority: "low",
+      issueType: "Task",
+      status: "to do",
+      completed: false,
+      dueDate: iso(today),
+      categoryId: "personal",
+      createdAt: Date.now() - 8000,
+    },
+    {
+      id: 4,
+      title: "Sketch landing page idea",
+      priority: "medium",
+      issueType: "Story",
+      status: "to do",
+      completed: false,
+      dueDate: plus(2),
+      categoryId: "ideas",
+      createdAt: Date.now() - 7000,
+    },
+    {
+      id: 5,
+      title: "Email professor about thesis",
+      priority: "medium",
+      issueType: "Task",
+      status: "done",
+      completed: true,
+      dueDate: plus(-1),
+      categoryId: "study",
+      createdAt: Date.now() - 6000,
+    },
+    {
+      id: 6,
+      title: "Plan weekend trip",
+      priority: "low",
+      issueType: "Task",
+      status: "to do",
+      completed: false,
+      dueDate: plus(4),
+      categoryId: "personal",
+      createdAt: Date.now() - 5000,
+    },
   ];
 }
 
@@ -77,11 +142,19 @@ export function useTodoController() {
   const [modalTaskId, setModalTaskId] = useState<number | null>(null);
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    } catch {
+      // Ignore localStorage errors
+    }
   }, [tasks]);
 
   useEffect(() => {
-    try { localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories)); } catch {}
+    try {
+      localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+    } catch {
+      // Ignore localStorage errors
+    }
   }, [categories]);
 
   const addTask = (titleArg?: string, opts?: Partial<Task>) => {
@@ -108,9 +181,13 @@ export function useTodoController() {
   const deleteTask = (id: number) => setTasks((prev) => prev.filter((t) => t.id !== id));
 
   const toggleTask = (id: number) =>
-    setTasks((prev) => prev.map((t) =>
-      t.id === id ? { ...t, completed: !t.completed, status: !t.completed ? "done" : "to do" } : t
-    ));
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === id
+          ? { ...t, completed: !t.completed, status: !t.completed ? "done" : "to do" }
+          : t,
+      ),
+    );
 
   const updateTask = (updated: Task) => {
     const normalized = { ...updated, completed: updated.status === "done" };
@@ -118,9 +195,9 @@ export function useTodoController() {
   };
 
   const setStatus = (id: number, status: Status) =>
-    setTasks((prev) => prev.map((t) =>
-      t.id === id ? { ...t, status, completed: status === "done" } : t
-    ));
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, status, completed: status === "done" } : t)),
+    );
 
   const addCategory = (name: string, color: string) => {
     const id = name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
@@ -128,43 +205,72 @@ export function useTodoController() {
   };
   const deleteCategory = (id: string) => setCategories((prev) => prev.filter((c) => c.id !== id));
 
-  const filteredTasks = useMemo(() => tasks.filter((task) => {
-    if (filter === "active" && (task.completed || task.status === "done")) return false;
-    if (filter === "completed" && !(task.completed || task.status === "done")) return false;
-    if (filterCategory !== "all" && task.categoryId !== filterCategory) return false;
-    if (filterPriority !== "all" && task.priority !== filterPriority) return false;
-    if (search.trim() && !task.title.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  }), [tasks, filter, filterCategory, filterPriority, search]);
+  const filteredTasks = useMemo(
+    () =>
+      tasks.filter((task) => {
+        if (filter === "active" && (task.completed || task.status === "done")) return false;
+        if (filter === "completed" && !(task.completed || task.status === "done")) return false;
+        if (filterCategory !== "all" && task.categoryId !== filterCategory) return false;
+        if (filterPriority !== "all" && task.priority !== filterPriority) return false;
+        if (search.trim() && !task.title.toLowerCase().includes(search.toLowerCase())) return false;
+        return true;
+      }),
+    [tasks, filter, filterCategory, filterPriority, search],
+  );
 
-  const stats = useMemo(() => ({
-    all: tasks.length,
-    active: tasks.filter((t) => !t.completed).length,
-    completed: tasks.filter((t) => t.completed).length,
-    today: tasks.filter((t) => t.dueDate === new Date().toISOString().slice(0, 10) && !t.completed).length,
-    overdue: tasks.filter((t) => t.dueDate && t.dueDate < new Date().toISOString().slice(0, 10) && !t.completed).length,
-  }), [tasks]);
+  const stats = useMemo(
+    () => ({
+      all: tasks.length,
+      active: tasks.filter((t) => !t.completed).length,
+      completed: tasks.filter((t) => t.completed).length,
+      today: tasks.filter(
+        (t) => t.dueDate === new Date().toISOString().slice(0, 10) && !t.completed,
+      ).length,
+      overdue: tasks.filter(
+        (t) => t.dueDate && t.dueDate < new Date().toISOString().slice(0, 10) && !t.completed,
+      ).length,
+    }),
+    [tasks],
+  );
 
   const selectedTask =
-    modalTaskId !== null ? tasks.find((t) => t.id === modalTaskId) ?? null : null;
+    modalTaskId !== null ? (tasks.find((t) => t.id === modalTaskId) ?? null) : null;
 
   return {
-    tasks, categories,
-    inputValue, setInputValue,
-    assignee, setAssignee,
-    issueType, setIssueType,
-    filter, setFilter,
-    priority, setPriority,
-    dueDate, setDueDate,
-    categoryId, setCategoryId,
-    search, setSearch,
-    filterCategory, setFilterCategory,
-    filterPriority, setFilterPriority,
-    modalTaskId, setModalTaskId,
+    tasks,
+    categories,
+    inputValue,
+    setInputValue,
+    assignee,
+    setAssignee,
+    issueType,
+    setIssueType,
+    filter,
+    setFilter,
+    priority,
+    setPriority,
+    dueDate,
+    setDueDate,
+    categoryId,
+    setCategoryId,
+    search,
+    setSearch,
+    filterCategory,
+    setFilterCategory,
+    filterPriority,
+    setFilterPriority,
+    modalTaskId,
+    setModalTaskId,
     selectedTask,
-    addTask, deleteTask, toggleTask, updateTask, setStatus,
-    addCategory, deleteCategory,
-    filteredTasks, stats,
+    addTask,
+    deleteTask,
+    toggleTask,
+    updateTask,
+    setStatus,
+    addCategory,
+    deleteCategory,
+    filteredTasks,
+    stats,
   };
 }
 
@@ -181,6 +287,26 @@ export function useTheme(): [ThemeMode, (m: ThemeMode) => void] {
     localStorage.setItem(THEME_KEY, mode);
   }, [mode]);
   return [mode, setMode];
+}
+
+// LANGUAGE
+export type Language = "en" | "uk";
+export function useLanguage(): [Language, (l: Language) => void] {
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window === "undefined") return "en";
+    return (localStorage.getItem(LANGUAGE_KEY) as Language) || "en";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(LANGUAGE_KEY, language);
+    // Change i18next language - import i18n dynamically to avoid SSR issues
+    if (typeof window !== "undefined") {
+      import("i18next").then((i18n) => {
+        i18n.default.changeLanguage(language);
+      });
+    }
+  }, [language]);
+  return [language, setLanguage];
 }
 
 // Global store via context — single source of truth across routes

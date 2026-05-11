@@ -1,27 +1,32 @@
 import { useTodo } from "@/todo/controller";
 import { Plus, Calendar, Flag, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { Priority } from "@/todo/model";
 
-const PHRASES = [
-  "What's on your mind?",
-  "What are we doing today?",
-  "Any new tasks?",
-  "What's next on the list?",
-  "Capture a quick thought…",
-  "Plan your next move…",
-];
+const defaultPlaceholderPhrases = ["What's next?", "Add a task...", "Plan something..."];
 
-function useTypingPlaceholder(active: boolean) {
+function useTypingPlaceholder(active: boolean, phrases: string[]) {
   const [text, setText] = useState("");
+  const phrasesRef = useRef(phrases);
+  const phraseKey = phrases.join("\u0000");
+
   useEffect(() => {
-    if (!active) { setText(""); return; }
+    phrasesRef.current = phrases;
+  }, [phrases]);
+
+  useEffect(() => {
+    if (!active) {
+      setText("");
+      return;
+    }
     let phraseIdx = 0;
     let charIdx = 0;
     let deleting = false;
     let timer: ReturnType<typeof setTimeout>;
     const tick = () => {
-      const phrase = PHRASES[phraseIdx];
+      const phrase = phrasesRef.current[phraseIdx];
       if (!deleting) {
         charIdx++;
         setText(phrase.slice(0, charIdx));
@@ -36,7 +41,7 @@ function useTypingPlaceholder(active: boolean) {
         setText(phrase.slice(0, charIdx));
         if (charIdx === 0) {
           deleting = false;
-          phraseIdx = (phraseIdx + 1) % PHRASES.length;
+          phraseIdx = (phraseIdx + 1) % phrasesRef.current.length;
           timer = setTimeout(tick, 300);
           return;
         }
@@ -45,17 +50,25 @@ function useTypingPlaceholder(active: boolean) {
     };
     timer = setTimeout(tick, 400);
     return () => clearTimeout(timer);
-  }, [active]);
+  }, [active, phraseKey]);
   return text;
 }
 
 export function QuickAdd({ compact = false }: { compact?: boolean }) {
   const c = useTodo();
-  const placeholder = useTypingPlaceholder(!c.inputValue);
+  const { t, ready } = useTranslation();
+  const safePhrases = useMemo(() => {
+    const phrases = ready ? (t("quickadd.phrases", { returnObjects: true }) as string[]) : [];
+    return Array.isArray(phrases) && phrases.length > 0 ? phrases : defaultPlaceholderPhrases;
+  }, [ready, t]);
+  const placeholder = useTypingPlaceholder(!c.inputValue, safePhrases);
   return (
     <div className="rounded-2xl border bg-card p-3 shadow-sm">
       <div className="flex items-center gap-2">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-primary-foreground"
+          style={{ background: "var(--gradient-primary)" }}
+        >
           <Plus className="h-4 w-4" />
         </div>
         <input
@@ -65,26 +78,45 @@ export function QuickAdd({ compact = false }: { compact?: boolean }) {
           onChange={(e) => c.setInputValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && c.addTask()}
         />
-        <Button size="sm" onClick={() => c.addTask()} disabled={!c.inputValue.trim()}>Add</Button>
+        <Button size="sm" onClick={() => c.addTask()} disabled={!c.inputValue.trim()}>
+          {t("actions.add")}
+        </Button>
       </div>
       {!compact && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t pt-2 text-xs">
           <label className="select-pill inline-flex items-center gap-1.5">
             <Calendar className="h-3 w-3 text-muted-foreground" />
-            <input type="date" value={c.dueDate ?? ""} onChange={(e) => c.setDueDate(e.target.value || undefined)} className="bg-transparent outline-none" />
+            <input
+              type="date"
+              value={c.dueDate ?? ""}
+              onChange={(e) => c.setDueDate(e.target.value || undefined)}
+              className="bg-transparent outline-none"
+            />
           </label>
           <div className="select-pill inline-flex items-center gap-1.5">
             <Flag className="h-3 w-3 text-muted-foreground" />
-            <select value={c.priority} onChange={(e) => c.setPriority(e.target.value as any)} className="bg-transparent outline-none capitalize">
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+            <select
+              value={c.priority}
+              onChange={(e) => c.setPriority(e.target.value as Priority)}
+              className="bg-transparent outline-none capitalize"
+            >
+              <option value="low">{t("priority.low")}</option>
+              <option value="medium">{t("priority.medium")}</option>
+              <option value="high">{t("priority.high")}</option>
             </select>
           </div>
           <div className="select-pill inline-flex items-center gap-1.5">
             <Tag className="h-3 w-3 text-muted-foreground" />
-            <select value={c.categoryId} onChange={(e) => c.setCategoryId(e.target.value)} className="bg-transparent outline-none">
-              {c.categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            <select
+              value={c.categoryId}
+              onChange={(e) => c.setCategoryId(e.target.value)}
+              className="bg-transparent outline-none"
+            >
+              {c.categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

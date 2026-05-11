@@ -1,0 +1,130 @@
+{
+  "app": {
+    "title": "Smart Task",
+    "subtitle": "Planner"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "projects": "Projects",
+    "board": "Board",
+    "calendar": "Calendar",
+    "settings": "Settings"
+  },
+  "sidebar": {
+    "workspace": "Workspace",
+    "toolbar": "Toolbar",
+    "expand": "Expand sidebar"
+  },
+  "stats": {
+    "today": "Today",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "done": "Done",
+    "total": "Total"
+  },
+  "dashboard": {
+    "total": "Total",
+    "tasks_one": "task",
+    "tasks_other": "tasks",
+    "items_one": "item",
+    "items_other": "items",
+    "nothing_today": "Nothing scheduled for today. Enjoy the calm!",
+    "currently_active": "Currently active",
+    "no_active": "No active task. Pick one to focus on.",
+    "this_week": "This week"
+  },
+  "search": {
+    "placeholder": "Search tasks…"
+  },
+  "status": {
+    "to_do": "To do",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "overdue": "Overdue"
+  },
+  "priority": {
+    "high": "High priority",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "categories": {
+    "personal": "Personal",
+    "study": "Study",
+    "work": "Work",
+    "ideas": "Ideas"
+  },
+  "actions": {
+    "add": "Add",
+    "mark_as_done": "Mark as done",
+    "view_all": "View all",
+    "whats_next": "What's next",
+    "open": "Open →"
+  },
+  "filters": {
+    "all": "All",
+    "active": "Active",
+    "completed": "Completed",
+    "all_categories": "All categories",
+    "all_priorities": "All priorities"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Personalize your workspace.",
+    "appearance": {
+      "title": "Appearance",
+      "desc": "Switch between light and dark theme."
+    },
+    "light": "Light",
+    "dark": "Dark",
+    "categories": {
+      "title": "Categories",
+      "desc": "Manage your project categories."
+    },
+    "tasks": {
+      "one": "task",
+      "other": "tasks"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "desc": "Get reminders for due tasks (concept).",
+      "daily_summary": "Daily summary at 9:00"
+    }
+  },
+  "projects": {
+    "title": "Projects & Categories",
+    "description": "Group your tasks by area of life or work.",
+    "new_category_placeholder": "New category name",
+    "add": "Add",
+    "done": "done"
+  },
+  "board": {
+    "title": "Board",
+    "description": "Drag cards across columns to update their status.",
+    "empty": "Drop tasks here"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "description": "See your tasks scheduled across the month."
+  },
+  "placeholders": {
+    "date": "dd.mm.yyyy"
+  },
+  "quickadd": {
+    "phrases": [
+      "What's on your mind?",
+      "What are we doing today?",
+      "Any new tasks?",
+      "What's next on the list?",
+      "Capture a quick thought…",
+      "Plan your next move…"
+    ]
+  },
+  "pages": {
+    "tasks": {
+      "title": "Tasks",
+      "description": "Capture, filter and complete your work.",
+      "no_tasks": "No tasks match your filters."
+    }
+  }
+}

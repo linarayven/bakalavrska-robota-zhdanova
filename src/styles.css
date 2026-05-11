@@ -181,16 +181,40 @@
   line-height: 1;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
-.select-pill:hover { background: var(--accent); border-color: var(--border); }
+.select-pill:hover {
+  background: var(--accent);
+  border-color: var(--border);
+}
 .select-pill:focus,
-.select-pill:focus-within { outline: none; border-color: var(--ring); }
-select.select-pill { appearance: none; -webkit-appearance: none; padding-right: 1.25rem;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 10px) 11px, calc(100% - 6px) 11px;
-  background-size: 4px 4px, 4px 4px;
+.select-pill:focus-within {
+  outline: none;
+  border-color: var(--ring);
+}
+select.select-pill {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 1.25rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 10px) 11px,
+    calc(100% - 6px) 11px;
+  background-size:
+    4px 4px,
+    4px 4px;
   background-repeat: no-repeat;
   text-transform: capitalize;
 }
-.select-pill select { appearance: none; -webkit-appearance: none; background: transparent; border: 0; outline: none; cursor: pointer; }
+.select-pill select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+}
