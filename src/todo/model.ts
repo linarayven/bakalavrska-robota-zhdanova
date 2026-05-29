@@ -10,6 +10,7 @@ export interface Task {
   status: "to do" | "in progress" | "done";
   createdAt: number;
   categoryId?: string;
+  templateId?: string;
 }
 
 export type FilterType = "all" | "active" | "completed";

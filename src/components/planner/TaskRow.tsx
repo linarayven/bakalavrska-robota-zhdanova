@@ -2,6 +2,7 @@ import { Task } from "@/todo/model";
 import { useTodo } from "@/todo/controller";
 import { Calendar, Trash2, Pencil, Flag, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toLocalDateString } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import type { Status } from "@/todo/model";
 
@@ -16,7 +17,7 @@ export function TaskRow({ task }: { task: Task }) {
   const { t } = useTranslation();
   const cat = c.categories.find((x) => x.id === task.categoryId);
   const overdue =
-    task.dueDate && task.dueDate < new Date().toISOString().slice(0, 10) && !task.completed;
+    task.dueDate && task.dueDate < toLocalDateString(new Date()) && !task.completed;
   return (
     <div
       className={cn(
@@ -61,7 +62,7 @@ export function TaskRow({ task }: { task: Task }) {
               }}
             >
               <Tag className="h-2.5 w-2.5" />
-              {cat.name}
+              {t(`categories.${cat.id}`, { defaultValue: cat.name })}
             </span>
           )}
           {task.dueDate && (

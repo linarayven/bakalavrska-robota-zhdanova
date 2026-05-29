@@ -108,7 +108,7 @@ function BoardPage() {
                               color: cat.color,
                             }}
                           >
-                            {cat.name}
+                            {t(`categories.${cat.id}`, { defaultValue: cat.name })}
                           </span>
                         )}
                         {task.dueDate && (

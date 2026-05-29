@@ -4,6 +4,7 @@ import { QuickAdd } from "@/components/planner/QuickAdd";
 import { TaskRow } from "@/components/planner/TaskRow";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, Flame, CheckCircle2, ListTodo, ArrowRight } from "lucide-react";
+import { toLocalDateString } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   const c = useTodo();
   const { t } = useTranslation();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = toLocalDateString(new Date());
   const todays = c.tasks.filter((t) => t.dueDate === today && !t.completed);
   const overdue = c.tasks.filter((t) => t.dueDate && t.dueDate < today && !t.completed);
   const active = c.tasks.find((t) => t.status === "in progress");
@@ -127,7 +128,7 @@ function Dashboard() {
             </div>
             <div className="grid grid-cols-7 gap-1">
               {week.map((d) => {
-                const iso = d.toISOString().slice(0, 10);
+                const iso = toLocalDateString(d);
                 const count = c.tasks.filter((t) => t.dueDate === iso && !t.completed).length;
                 const isToday = iso === today;
                 return (

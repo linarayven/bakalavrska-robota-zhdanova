@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Smart Task",
+    "title": "Smart Tasks",
     "subtitle": "Planner"
   },
   "navigation": {
@@ -29,8 +29,8 @@
     "tasks_other": "tasks",
     "items_one": "item",
     "items_other": "items",
-    "nothing_today": "Nothing scheduled for today. Enjoy the calm!",
-    "currently_active": "Currently active",
+    "nothing_today": "No tasks for today. Enjoy the calm!",
+    "currently_active": "Currently active task",
     "no_active": "No active task. Pick one to focus on.",
     "this_week": "This week"
   },
@@ -44,7 +44,7 @@
     "overdue": "Overdue"
   },
   "priority": {
-    "high": "High priority",
+    "high": "High",
     "medium": "Medium",
     "low": "Low"
   },
@@ -70,16 +70,16 @@
   },
   "settings": {
     "title": "Settings",
-    "description": "Personalize your workspace.",
+    "description": "Customize your workspace.",
     "appearance": {
       "title": "Appearance",
-      "desc": "Switch between light and dark theme."
+      "desc": "Switch between light and dark themes."
     },
     "light": "Light",
     "dark": "Dark",
     "categories": {
       "title": "Categories",
-      "desc": "Manage your project categories."
+      "desc": "Manage project categories."
     },
     "tasks": {
       "one": "task",
@@ -87,25 +87,25 @@
     },
     "notifications": {
       "title": "Notifications",
-      "desc": "Get reminders for due tasks (concept).",
+      "desc": "Get reminders for overdue tasks.",
       "daily_summary": "Daily summary at 9:00"
     }
   },
   "projects": {
     "title": "Projects & Categories",
-    "description": "Group your tasks by area of life or work.",
+    "description": "Group tasks by area of life or work.",
     "new_category_placeholder": "New category name",
     "add": "Add",
     "done": "done"
   },
   "board": {
     "title": "Board",
-    "description": "Drag cards across columns to update their status.",
+    "description": "Drag cards between columns to change status.",
     "empty": "Drop tasks here"
   },
   "calendar": {
     "title": "Calendar",
-    "description": "See your tasks scheduled across the month."
+    "description": "View tasks by month."
   },
   "placeholders": {
     "date": "dd.mm.yyyy"
@@ -116,15 +116,41 @@
       "What are we doing today?",
       "Any new tasks?",
       "What's next on the list?",
-      "Capture a quick thought…",
-      "Plan your next move…"
+      "Write a quick thought…",
+      "Plan your next step…"
     ]
   },
   "pages": {
     "tasks": {
       "title": "Tasks",
-      "description": "Capture, filter and complete your work.",
+      "description": "Add, filter and complete your tasks.",
       "no_tasks": "No tasks match your filters."
+    }
+  },
+  "editModal": {
+    "title": "Edit task",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "dueDate": "Due date",
+      "category": "Category",
+      "priority": "Priority",
+      "status": "Status"
+    },
+    "actions": {
+      "delete": "Delete task",
+      "cancel": "Cancel",
+      "save": "Save changes"
+    },
+    "priorityOptions": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "statusOptions": {
+      "todo": "To do",
+      "inProgress": "In progress",
+      "done": "Done"
     }
   }
 }

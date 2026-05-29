@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { toLocalDateString } from "@/lib/utils";
 import type { Task, FilterType, Priority, IssueType, Status, Category } from "./model";
 import { DEFAULT_CATEGORIES } from "./model";
 
@@ -7,111 +8,220 @@ const CATEGORIES_KEY = "stp.categories";
 const THEME_KEY = "stp.theme";
 const LANGUAGE_KEY = "stp.language";
 
-function loadTasks(): Task[] {
+function loadTasks(language: Language): Task[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return seedTasks();
+    if (!saved) return seedTasks(language);
     const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map((t: any) => {
-      const completedFlag = typeof t.completed === "boolean" ? t.completed : false;
-      const statusValue: Status = t.status ?? (completedFlag ? "done" : "to do");
+    if (!Array.isArray(parsed)) return seedTasks(language);
+    return parsed.map((t: unknown) => {
+      const item = t as Record<string, unknown>;
+      const completedFlag = typeof item.completed === "boolean" ? item.completed : false;
+      let statusValue: Status = "to do";
+      if (typeof item.status === "string") {
+        statusValue = item.status as Status;
+      } else if (completedFlag) {
+        statusValue = "done";
+      }
+
+      let title: string;
+      if (typeof item.title === "string") {
+        title = item.title;
+      } else if (typeof item.summary === "string") {
+        title = item.summary;
+      } else {
+        title = "(No title)";
+      }
+      const description = typeof item.description === "string" ? item.description : "";
+      const priority = typeof item.priority === "string" ? (item.priority as Priority) : "medium";
+      const issueType = typeof item.issueType === "string" ? (item.issueType as IssueType) : "Task";
+      const assignee = typeof item.assignee === "string" ? item.assignee : undefined;
+      const dueDate = typeof item.dueDate === "string" ? item.dueDate : undefined;
+      const createdAt = typeof item.createdAt === "number" ? item.createdAt : Date.now();
+      const categoryId = typeof item.categoryId === "string" ? item.categoryId : "personal";
+      const templateId = typeof item.templateId === "string" ? item.templateId : undefined;
       return {
-        id: t.id ?? Date.now(),
-        title: t.title ?? t.summary ?? "(No title)",
-        description: t.description ?? "",
+        id: typeof item.id === "number" ? item.id : Date.now(),
+        title,
+        description,
         completed: statusValue === "done" ? true : completedFlag,
-        priority: t.priority ?? "medium",
-        issueType: t.issueType ?? "Task",
-        assignee: t.assignee ?? undefined,
-        dueDate: t.dueDate ?? undefined,
+        priority,
+        issueType,
+        assignee,
+        dueDate,
         status: statusValue,
-        createdAt: t.createdAt ?? Date.now(),
-        categoryId: t.categoryId ?? "personal",
+        createdAt,
+        categoryId,
+        templateId,
       } as Task;
     });
   } catch (e) {
     console.error("Failed to load tasks", e);
-    return [];
+    return seedTasks(language);
   }
 }
 
-function seedTasks(): Task[] {
+function seedTasks(language: Language): Task[] {
   const today = new Date();
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const iso = (d: Date) => toLocalDateString(d);
   const plus = (n: number) => {
     const d = new Date(today);
     d.setDate(d.getDate() + n);
     return iso(d);
   };
-  return [
-    {
-      id: 1,
-      title: "Read chapter 4 — Linear Algebra",
-      priority: "high",
-      issueType: "Task",
-      status: "in progress",
-      completed: false,
-      dueDate: iso(today),
-      categoryId: "study",
-      createdAt: Date.now() - 10000,
-    },
-    {
-      id: 2,
-      title: "Submit UX assignment",
-      priority: "high",
-      issueType: "Task",
-      status: "to do",
-      completed: false,
-      dueDate: plus(1),
-      categoryId: "study",
-      createdAt: Date.now() - 9000,
-    },
-    {
-      id: 3,
-      title: "Gym session",
-      priority: "low",
-      issueType: "Task",
-      status: "to do",
-      completed: false,
-      dueDate: iso(today),
-      categoryId: "personal",
-      createdAt: Date.now() - 8000,
-    },
-    {
-      id: 4,
-      title: "Sketch landing page idea",
-      priority: "medium",
-      issueType: "Story",
-      status: "to do",
-      completed: false,
-      dueDate: plus(2),
-      categoryId: "ideas",
-      createdAt: Date.now() - 7000,
-    },
-    {
-      id: 5,
-      title: "Email professor about thesis",
-      priority: "medium",
-      issueType: "Task",
-      status: "done",
-      completed: true,
-      dueDate: plus(-1),
-      categoryId: "study",
-      createdAt: Date.now() - 6000,
-    },
-    {
-      id: 6,
-      title: "Plan weekend trip",
-      priority: "low",
-      issueType: "Task",
-      status: "to do",
-      completed: false,
-      dueDate: plus(4),
-      categoryId: "personal",
-      createdAt: Date.now() - 5000,
-    },
-  ];
+
+  const seedData =
+    language === "uk"
+      ? [
+          {
+            id: 1,
+            title: "Прочитати розділ 4 - Лінійна алгебра",
+            priority: "high" as const,
+            issueType: "Task" as const,
+            status: "in progress" as const,
+            completed: false,
+            dueDate: plus(30),
+            categoryId: "study",
+            createdAt: Date.now() - 10000,
+            templateId: "study-linear-algebra",
+          },
+          {
+            id: 2,
+            title: "Надіслати завдання по UX",
+            priority: "high" as const,
+            issueType: "Task" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(31),
+            categoryId: "study",
+            createdAt: Date.now() - 9000,
+            templateId: "submit-ux-assignment",
+          },
+          {
+            id: 3,
+            title: "Тренування в залі",
+            priority: "low" as const,
+            issueType: "Task" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(30),
+            categoryId: "personal",
+            createdAt: Date.now() - 8000,
+            templateId: "gym-session",
+          },
+          {
+            id: 4,
+            title: "Намалювати ескіз ідеї для цільової сторінки",
+            priority: "medium" as const,
+            issueType: "Story" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(32),
+            categoryId: "ideas",
+            createdAt: Date.now() - 7000,
+            templateId: "sketch-landing-page",
+          },
+          {
+            id: 5,
+            title: "Надіслати професору електронного листа щодо дипломної роботи",
+            priority: "medium" as const,
+            issueType: "Task" as const,
+            status: "done" as const,
+            completed: true,
+            dueDate: plus(29),
+            categoryId: "study",
+            createdAt: Date.now() - 6000,
+            templateId: "email-professor",
+          },
+          {
+            id: 6,
+            title: "Запланувати вихідні",
+            priority: "low" as const,
+            issueType: "Task" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(33),
+            categoryId: "personal",
+            createdAt: Date.now() - 5000,
+            templateId: "plan-weekend",
+          },
+        ]
+      : [
+          {
+            id: 1,
+            title: "Read chapter 4 — Linear Algebra",
+            priority: "high" as const,
+            issueType: "Task" as const,
+            status: "in progress" as const,
+            completed: false,
+            dueDate: plus(30),
+            categoryId: "study",
+            createdAt: Date.now() - 10000,
+            templateId: "study-linear-algebra",
+          },
+          {
+            id: 2,
+            title: "Submit UX assignment",
+            priority: "high" as const,
+            issueType: "Task" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(31),
+            categoryId: "study",
+            createdAt: Date.now() - 9000,
+            templateId: "submit-ux-assignment",
+          },
+          {
+            id: 3,
+            title: "Gym session",
+            priority: "low" as const,
+            issueType: "Task" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(30),
+            categoryId: "personal",
+            createdAt: Date.now() - 8000,
+            templateId: "gym-session",
+          },
+          {
+            id: 4,
+            title: "Sketch landing page idea",
+            priority: "medium" as const,
+            issueType: "Story" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(32),
+            categoryId: "ideas",
+            createdAt: Date.now() - 7000,
+            templateId: "sketch-landing-page",
+          },
+          {
+            id: 5,
+            title: "Email professor about thesis",
+            priority: "medium" as const,
+            issueType: "Task" as const,
+            status: "done" as const,
+            completed: true,
+            dueDate: plus(29),
+            categoryId: "study",
+            createdAt: Date.now() - 6000,
+            templateId: "email-professor",
+          },
+          {
+            id: 6,
+            title: "Plan weekend trip",
+            priority: "low" as const,
+            issueType: "Task" as const,
+            status: "to do" as const,
+            completed: false,
+            dueDate: plus(33),
+            categoryId: "personal",
+            createdAt: Date.now() - 5000,
+            templateId: "plan-weekend",
+          },
+        ];
+
+  return seedData;
 }
 
 function loadCategories(): Category[] {
@@ -126,8 +236,8 @@ function loadCategories(): Category[] {
   }
 }
 
-export function useTodoController() {
-  const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
+export function useTodoController(language: Language) {
+  const [tasks, setTasks] = useState<Task[]>(() => loadTasks(language));
   const [categories, setCategories] = useState<Category[]>(() => loadCategories());
   const [inputValue, setInputValue] = useState("");
   const [assignee, setAssignee] = useState("");
@@ -156,6 +266,18 @@ export function useTodoController() {
       // Ignore localStorage errors
     }
   }, [categories]);
+
+  useEffect(() => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (!task.templateId) return task;
+        const title = seedTasks(language).find(
+          (seed) => seed.templateId === task.templateId,
+        )?.title;
+        return title ? { ...task, title } : task;
+      }),
+    );
+  }, [language]);
 
   const addTask = (titleArg?: string, opts?: Partial<Task>) => {
     const title = (titleArg ?? inputValue).trim();
@@ -191,7 +313,15 @@ export function useTodoController() {
 
   const updateTask = (updated: Task) => {
     const normalized = { ...updated, completed: updated.status === "done" };
-    setTasks((prev) => prev.map((t) => (t.id === normalized.id ? normalized : t)));
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== normalized.id) return t;
+        return {
+          ...normalized,
+          templateId: t.title === normalized.title ? t.templateId : undefined,
+        };
+      }),
+    );
   };
 
   const setStatus = (id: number, status: Status) =>
@@ -218,19 +348,17 @@ export function useTodoController() {
     [tasks, filter, filterCategory, filterPriority, search],
   );
 
+  const today = toLocalDateString(new Date());
+
   const stats = useMemo(
     () => ({
       all: tasks.length,
       active: tasks.filter((t) => !t.completed).length,
       completed: tasks.filter((t) => t.completed).length,
-      today: tasks.filter(
-        (t) => t.dueDate === new Date().toISOString().slice(0, 10) && !t.completed,
-      ).length,
-      overdue: tasks.filter(
-        (t) => t.dueDate && t.dueDate < new Date().toISOString().slice(0, 10) && !t.completed,
-      ).length,
+      today: tasks.filter((t) => t.dueDate === today && !t.completed).length,
+      overdue: tasks.filter((t) => t.dueDate && t.dueDate < today && !t.completed).length,
     }),
-    [tasks],
+    [tasks, today],
   );
 
   const selectedTask =

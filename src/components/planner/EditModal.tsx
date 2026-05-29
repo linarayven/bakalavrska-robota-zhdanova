@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Task, Priority, Status } from "@/todo/model";
 import { useTodo } from "@/todo/controller";
 import { X, Trash2 } from "lucide-react";
@@ -30,6 +31,7 @@ function Inner({
   onClose: () => void;
   onSave: (t: Task) => void;
 }) {
+  const { t } = useTranslation();
   const c = useTodo();
   const [draft, setDraft] = useState<Task>(task);
   const set = <K extends keyof Task>(k: K, v: Task[K]) => setDraft((p) => ({ ...p, [k]: v }));
@@ -43,14 +45,14 @@ function Inner({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b p-4">
-          <h3 className="text-base font-semibold">Edit task</h3>
+          <h3 className="text-base font-semibold">{t("editModal.title")}</h3>
           <button onClick={onClose} className="rounded-md p-1.5 hover:bg-muted">
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="space-y-3 p-4">
           <label className="block text-xs font-medium text-muted-foreground">
-            Title
+            {t("editModal.fields.title")}
             <input
               className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
               value={draft.title}
@@ -58,7 +60,7 @@ function Inner({
             />
           </label>
           <label className="block text-xs font-medium text-muted-foreground">
-            Description
+            {t("editModal.fields.description")}
             <textarea
               rows={3}
               className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
@@ -68,7 +70,7 @@ function Inner({
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-xs font-medium text-muted-foreground">
-              Due date
+              {t("editModal.fields.dueDate")}
               <input
                 type="date"
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
@@ -77,7 +79,7 @@ function Inner({
               />
             </label>
             <label className="block text-xs font-medium text-muted-foreground">
-              Category
+              {t("editModal.fields.category")}
               <select
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
                 value={draft.categoryId ?? ""}
@@ -91,27 +93,27 @@ function Inner({
               </select>
             </label>
             <label className="block text-xs font-medium text-muted-foreground">
-              Priority
+              {t("editModal.fields.priority")}
               <select
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
                 value={draft.priority}
                 onChange={(e) => set("priority", e.target.value as Priority)}
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+                <option value="low">{t("editModal.priorityOptions.low")}</option>
+                <option value="medium">{t("editModal.priorityOptions.medium")}</option>
+                <option value="high">{t("editModal.priorityOptions.high")}</option>
               </select>
             </label>
             <label className="block text-xs font-medium text-muted-foreground">
-              Status
+              {t("editModal.fields.status")}
               <select
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
                 value={draft.status}
                 onChange={(e) => set("status", e.target.value as Status)}
               >
-                <option value="to do">To do</option>
-                <option value="in progress">In progress</option>
-                <option value="done">Done</option>
+                <option value="to do">{t("editModal.statusOptions.todo")}</option>
+                <option value="in progress">{t("editModal.statusOptions.inProgress")}</option>
+                <option value="done">{t("editModal.statusOptions.done")}</option>
               </select>
             </label>
           </div>
@@ -124,13 +126,13 @@ function Inner({
               onClose();
             }}
           >
-            <Trash2 className="h-4 w-4" /> Delete task
+            <Trash2 className="h-4 w-4" /> {t("editModal.actions.delete")}
           </Button>
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={onClose}>
-              Cancel
+              {t("editModal.actions.cancel")}
             </Button>
-            <Button onClick={() => onSave(draft)}>Save changes</Button>
+            <Button onClick={() => onSave(draft)}>{t("editModal.actions.save")}</Button>
           </div>
         </div>
       </div>

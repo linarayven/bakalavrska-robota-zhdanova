@@ -3,9 +3,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/planner/AppSidebar";
 import { TodoProvider } from "@/todo/TodoProvider";
 import { EditModal } from "@/components/planner/EditModal";
-import { useTheme, useLanguage } from "@/todo/controller";
+import { useLanguage, Language, useTheme, useTodo } from "@/todo/controller";
 import { Moon, Sun, Search, Languages } from "lucide-react";
-import { useTodo } from "@/todo/controller";
 import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
@@ -22,7 +21,8 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-md 
+            bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             Go home
           </Link>
@@ -84,13 +84,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const [language, setLanguage] = useLanguage();
+
   return (
-    <TodoProvider>
+    <TodoProvider language={language}>
       <SidebarProvider>
         <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
           <div className="flex min-w-0 flex-1 flex-col">
-            <Topbar />
+            <Topbar language={language} setLanguage={setLanguage} />
             <main className="flex-1 overflow-auto">
               <Outlet />
             </main>
@@ -102,9 +104,14 @@ function RootComponent() {
   );
 }
 
-function Topbar() {
+function Topbar({
+  language,
+  setLanguage,
+}: {
+  language: Language;
+  setLanguage: (l: Language) => void;
+}) {
   const [mode, setMode] = useTheme();
-  const [language, setLanguage] = useLanguage();
   const c = useTodo();
   const { t } = useTranslation();
   return (

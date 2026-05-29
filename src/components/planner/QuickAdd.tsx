@@ -114,7 +114,7 @@ export function QuickAdd({ compact = false }: { compact?: boolean }) {
             >
               {c.categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                  {t(`categories.${cat.id}`, { defaultValue: cat.name })}
                 </option>
               ))}
             </select>

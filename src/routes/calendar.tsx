@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react";
 import { Task } from "@/todo/model";
+import { toLocalDateString } from "@/lib/utils";
 
 export const Route = createFileRoute("/calendar")({
   head: () => ({
@@ -43,7 +44,7 @@ function CalendarPage() {
   for (let i = 0; i < firstDay; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
   while (cells.length % 7 !== 0) cells.push(null);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = toLocalDateString(new Date());
 
   const move = (delta: number) => {
     const d = new Date(cursor);
@@ -62,7 +63,7 @@ function CalendarPage() {
           <button onClick={() => move(-1)} className="rounded-md border p-1.5 hover:bg-muted">
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <div className="min-w-[140px] text-center text-sm font-semibold">
+          <div className="min-w-35 text-center text-sm font-semibold">
             {cursor.toLocaleDateString(locale, { month: "long", year: "numeric" })}
           </div>
           <button onClick={() => move(1)} className="rounded-md border p-1.5 hover:bg-muted">
@@ -81,12 +82,12 @@ function CalendarPage() {
         </div>
         <div className="grid grid-cols-7">
           {cells.map((d, i) => {
-            if (!d) return <div key={i} className="min-h-[100px] border-b border-r bg-muted/10" />;
-            const iso = d.toISOString().slice(0, 10);
+            if (!d) return <div key={i} className="min-h-25 border-b border-r bg-muted/10" />;
+            const iso = toLocalDateString(d);
             const items = c.tasks.filter((t) => t.dueDate === iso);
             const isToday = iso === today;
             return (
-              <div key={i} className="min-h-[100px] border-b border-r p-1.5 last:border-r-0">
+              <div key={i} className="min-h-25 border-b border-r p-1.5 last:border-r-0">
                 <div
                   className={`mb-1 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-medium ${isToday ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
                 >
