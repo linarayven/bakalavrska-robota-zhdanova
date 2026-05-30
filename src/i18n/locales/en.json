@@ -72,7 +72,7 @@
     "all_categories": "All categories",
     "all_priorities": "All priorities"
   },
-  "settings": {
+"settings": {
     "title": "Settings",
     "description": "Customize your workspace.",
     "appearance": {
@@ -93,6 +93,16 @@
       "title": "Notifications",
       "desc": "Get reminders for overdue tasks.",
       "daily_summary": "Daily summary at 9:00"
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "desc": "Irreversible actions that affect all data.",
+      "clear": "Clear all data",
+      "confirm_title": "Are you sure?",
+      "confirm_desc": "This will permanently delete all tasks and custom categories. This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Yes, clear everything",
+      "cleared": "All data cleared"
     }
   },
   "projects": {
@@ -128,7 +138,8 @@
     "tasks": {
       "title": "Tasks",
       "description": "Add, filter and complete your tasks.",
-      "no_tasks": "No tasks match your filters."
+      "no_tasks_empty": "No tasks yet. Add your first task above!",
+      "no_tasks_filter": "No tasks match the selected filters."
     }
   },
   "editModal": {

@@ -2,6 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTheme, useTodo } from "@/todo/controller";
 import { useTranslation } from "react-i18next";
 import { Moon, Sun, Bell, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -50,9 +62,14 @@ function SettingsPage() {
             >
               <div className="flex items-center gap-3">
                 <div className="h-3 w-3 rounded-full" style={{ background: cat.color }} />
-                <span className="text-sm font-medium">{t(`categories.${cat.id}`, { defaultValue: cat.name })}</span>
+                <span className="text-sm font-medium">
+                  {t(`categories.${cat.id}`, { defaultValue: cat.name })}
+                </span>
                 <span className="text-xs text-muted-foreground">
-                  {c.tasks.filter((t) => t.categoryId === cat.id).length} {c.tasks.filter((t) => t.categoryId === cat.id).length === 1 ? t("settings.tasks.one") : t("settings.tasks.other")}
+                  {c.tasks.filter((t) => t.categoryId === cat.id).length}{" "}
+                  {c.tasks.filter((t) => t.categoryId === cat.id).length === 1
+                    ? t("settings.tasks.one")
+                    : t("settings.tasks.other")}
                 </span>
               </div>
               <button
@@ -71,8 +88,40 @@ function SettingsPage() {
           <span className="inline-flex items-center gap-2">
             <Bell className="h-4 w-4" /> {t("settings.notifications.daily_summary")}
           </span>
-          <input type="checkbox" defaultChecked className="h-4 w-4 accent-[color:var(--primary)]" />
+          <input type="checkbox" defaultChecked className="h-4 w-4 accent-primary" />
         </label>
+      </Section>
+
+      <Section title={t("settings.danger.title")} desc={t("settings.danger.desc")}>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm font-medium text-destructive transition hover:bg-destructive/10">
+              <Trash2 className="h-4 w-4" />
+              {t("settings.danger.clear")}
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t("settings.danger.confirm_title")}</AlertDialogTitle>
+              <AlertDialogDescription>{t("settings.danger.confirm_desc")}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("settings.danger.cancel")}</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => {
+                  [...c.tasks].forEach((task) => c.deleteTask(task.id));
+                  c.categories
+                    .filter((cat) => !["study", "work", "personal", "ideas"].includes(cat.id))
+                    .forEach((cat) => c.deleteCategory(cat.id));
+                  toast.success(t("settings.danger.cleared"));
+                }}
+              >
+                {t("settings.danger.confirm")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </Section>
     </div>
   );

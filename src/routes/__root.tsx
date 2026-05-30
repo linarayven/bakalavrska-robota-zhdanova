@@ -8,6 +8,7 @@ import { Moon, Sun, Search, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -99,6 +100,7 @@ function RootComponent() {
           </div>
         </div>
         <EditModal />
+        <Toaster richColors position="bottom-right" />
       </SidebarProvider>
     </TodoProvider>
   );

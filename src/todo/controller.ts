@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import { toLocalDateString } from "@/lib/utils";
 import type { Task, FilterType, Priority, IssueType, Status, Category } from "./model";
 import { DEFAULT_CATEGORIES } from "./model";
+import { seedTasks } from "./seeds";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "stp.tasks";
 const CATEGORIES_KEY = "stp.categories";
@@ -59,169 +61,6 @@ function loadTasks(language: Language): Task[] {
     console.error("Failed to load tasks", e);
     return seedTasks(language);
   }
-}
-
-function seedTasks(language: Language): Task[] {
-  const today = new Date();
-  const iso = (d: Date) => toLocalDateString(d);
-  const plus = (n: number) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() + n);
-    return iso(d);
-  };
-
-  const seedData =
-    language === "uk"
-      ? [
-          {
-            id: 1,
-            title: "Прочитати розділ 4 - Лінійна алгебра",
-            priority: "high" as const,
-            issueType: "Task" as const,
-            status: "in progress" as const,
-            completed: false,
-            dueDate: plus(30),
-            categoryId: "study",
-            createdAt: Date.now() - 10000,
-            templateId: "study-linear-algebra",
-          },
-          {
-            id: 2,
-            title: "Надіслати завдання по UX",
-            priority: "high" as const,
-            issueType: "Task" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(31),
-            categoryId: "study",
-            createdAt: Date.now() - 9000,
-            templateId: "submit-ux-assignment",
-          },
-          {
-            id: 3,
-            title: "Тренування в залі",
-            priority: "low" as const,
-            issueType: "Task" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(30),
-            categoryId: "personal",
-            createdAt: Date.now() - 8000,
-            templateId: "gym-session",
-          },
-          {
-            id: 4,
-            title: "Намалювати ескіз ідеї для цільової сторінки",
-            priority: "medium" as const,
-            issueType: "Story" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(32),
-            categoryId: "ideas",
-            createdAt: Date.now() - 7000,
-            templateId: "sketch-landing-page",
-          },
-          {
-            id: 5,
-            title: "Надіслати професору електронного листа щодо дипломної роботи",
-            priority: "medium" as const,
-            issueType: "Task" as const,
-            status: "done" as const,
-            completed: true,
-            dueDate: plus(29),
-            categoryId: "study",
-            createdAt: Date.now() - 6000,
-            templateId: "email-professor",
-          },
-          {
-            id: 6,
-            title: "Запланувати вихідні",
-            priority: "low" as const,
-            issueType: "Task" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(33),
-            categoryId: "personal",
-            createdAt: Date.now() - 5000,
-            templateId: "plan-weekend",
-          },
-        ]
-      : [
-          {
-            id: 1,
-            title: "Read chapter 4 — Linear Algebra",
-            priority: "high" as const,
-            issueType: "Task" as const,
-            status: "in progress" as const,
-            completed: false,
-            dueDate: plus(30),
-            categoryId: "study",
-            createdAt: Date.now() - 10000,
-            templateId: "study-linear-algebra",
-          },
-          {
-            id: 2,
-            title: "Submit UX assignment",
-            priority: "high" as const,
-            issueType: "Task" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(31),
-            categoryId: "study",
-            createdAt: Date.now() - 9000,
-            templateId: "submit-ux-assignment",
-          },
-          {
-            id: 3,
-            title: "Gym session",
-            priority: "low" as const,
-            issueType: "Task" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(30),
-            categoryId: "personal",
-            createdAt: Date.now() - 8000,
-            templateId: "gym-session",
-          },
-          {
-            id: 4,
-            title: "Sketch landing page idea",
-            priority: "medium" as const,
-            issueType: "Story" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(32),
-            categoryId: "ideas",
-            createdAt: Date.now() - 7000,
-            templateId: "sketch-landing-page",
-          },
-          {
-            id: 5,
-            title: "Email professor about thesis",
-            priority: "medium" as const,
-            issueType: "Task" as const,
-            status: "done" as const,
-            completed: true,
-            dueDate: plus(29),
-            categoryId: "study",
-            createdAt: Date.now() - 6000,
-            templateId: "email-professor",
-          },
-          {
-            id: 6,
-            title: "Plan weekend trip",
-            priority: "low" as const,
-            issueType: "Task" as const,
-            status: "to do" as const,
-            completed: false,
-            dueDate: plus(33),
-            categoryId: "personal",
-            createdAt: Date.now() - 5000,
-            templateId: "plan-weekend",
-          },
-        ];
-
-  return seedData;
 }
 
 function loadCategories(): Category[] {
@@ -298,9 +137,24 @@ export function useTodoController(language: Language) {
     };
     setTasks((prev) => [newTask, ...prev]);
     setInputValue("");
+    toast.success(language === "uk" ? "Завдання створено" : "Task created", {
+      description: newTask.title,
+    });
   };
 
-  const deleteTask = (id: number) => setTasks((prev) => prev.filter((t) => t.id !== id));
+  const deleteTask = (id: number) => {
+    const taskToDelete = tasks.find((t) => t.id === id);
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    if (taskToDelete) {
+      toast(language === "uk" ? "Завдання видалено" : "Task deleted", {
+        description: taskToDelete.title,
+        action: {
+          label: language === "uk" ? "Скасувати" : "Undo",
+          onClick: () => setTasks((prev) => [taskToDelete, ...prev]),
+        },
+      });
+    }
+  };
 
   const toggleTask = (id: number) =>
     setTasks((prev) =>
@@ -322,6 +176,7 @@ export function useTodoController(language: Language) {
         };
       }),
     );
+    toast.success(language === "uk" ? "Зміни збережено" : "Changes saved");
   };
 
   const setStatus = (id: number, status: Status) =>

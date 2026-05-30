@@ -34,7 +34,7 @@ function TasksPage() {
       <QuickAdd />
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border bg-card p-2 shadow-sm">
-        <div className="relative flex-1 min-w-[180px]">
+        <div className="relative flex-1 min-w-45">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={c.search}
@@ -81,7 +81,9 @@ function TasksPage() {
 
       {c.filteredTasks.length === 0 ? (
         <div className="rounded-2xl border border-dashed bg-muted/20 p-10 text-center text-sm text-muted-foreground">
-          {t("pages.tasks.no_tasks")}
+          {c.tasks.length === 0
+            ? t("pages.tasks.no_tasks_empty")
+            : t("pages.tasks.no_tasks_filter")}
         </div>
       ) : (
         <div className="space-y-2">
