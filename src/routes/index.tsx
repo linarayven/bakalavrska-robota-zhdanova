@@ -3,7 +3,7 @@ import { useTodo } from "@/todo/controller";
 import { QuickAdd } from "@/components/planner/QuickAdd";
 import { TaskRow } from "@/components/planner/TaskRow";
 import { useTranslation } from "react-i18next";
-import { CalendarDays, Flame, CheckCircle2, ListTodo, ArrowRight } from "lucide-react";
+import { CalendarDays, Flame, CheckCircle2, ListTodo, ArrowRight, Check } from "lucide-react";
 import { toLocalDateString } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const c = useTodo();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const today = toLocalDateString(new Date());
   const todays = c.tasks.filter((t) => t.dueDate === today && !t.completed);
   const overdue = c.tasks.filter((t) => t.dueDate && t.dueDate < today && !t.completed);
@@ -32,6 +32,31 @@ function Dashboard() {
     d.setDate(d.getDate() + i);
     return d;
   });
+
+  const activeTasks = c.tasks.filter((t) => t.status === "in progress");
+  const activeTasksSorted = [...activeTasks].sort((a, b) => {
+    const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    if (a.priority !== b.priority) return priorityOrder[a.priority] - priorityOrder[b.priority];
+    if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+    if (a.dueDate) return -1;
+    if (b.dueDate) return 1;
+    return a.createdAt - b.createdAt;
+  });
+  const activeTasksPreview = activeTasksSorted.slice(0, 3);
+
+  const activeCount = activeTasks.length;
+  const ukrainianActiveLabel = (n: number) => {
+    if (n === 0) return `0 активних`;
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod100 >= 11 && mod100 <= 14) return `${n} активних`;
+    if (mod10 === 1) return `${n} активне`;
+    if (mod10 >= 2 && mod10 <= 4) return `${n} активні`;
+    return `${n} активних`;
+  };
+  const activeCountLabel = i18n?.language?.startsWith("uk")
+    ? ukrainianActiveLabel(activeCount)
+    : `${activeCount} active`;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
@@ -98,26 +123,80 @@ function Dashboard() {
         </section>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border bg-card p-4 shadow-sm">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {t("dashboard.currently_active")}
-            </div>
-            {active ? (
-              <div>
-                <div className="text-sm font-semibold">{active.title}</div>
-                <div className="mt-1 text-xs text-muted-foreground capitalize">
-                  {t(`priority.${active.priority}`)}
-                </div>
-                <button
-                  onClick={() => c.toggleTask(active.id)}
-                  className="mt-3 w-full rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          <div className="rounded-2xl border bg-muted/20 p-3 shadow-sm" >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="text-sm font-semibold">
+                {activeTasks.length > 1 ? t("dashboard.active_tasks") : t("dashboard.currently_active")}
+                {activeCount > 0 && <span className="text-muted-foreground">{` · ${activeCountLabel}`}</span>}
+              </div>
+              {activeTasks.length > 0 && (
+                <Link
+                  to="/board"
+                  className="text-xs font-medium text-primary hover:text-primary/80"
                 >
-                  {t("actions.mark_as_done")}
-                </button>
+                  {t("dashboard.show_full_list")}
+                </Link>
+              )}
+            </div>
+            {activeTasks.length > 0 ? (
+              <div className="space-y-3">
+                {activeTasksPreview.map((task) => (
+                  <div
+                    key={task.id}
+                     className="flex items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 shadow-sm transition-all hover:shadow-md"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium">{task.title}</div>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{
+                            background:
+                              task.priority === "high"
+                                ? "var(--priority-high)"
+                                : task.priority === "medium"
+                                  ? "var(--priority-medium)"
+                                  : "var(--priority-low)",
+                          }}
+                        />
+                        {t(`priority.${task.priority}`)}
+                        {task.dueDate && (
+                          <>
+                            <span>•</span>
+                            <span>
+                              {new Date(task.dueDate).toLocaleDateString(undefined, {
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => c.toggleTask(task.id)}
+                      className="inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-transparent px-2.5 text-xs font-medium text-primary hover:bg-primary/5 transition-colors gap-1"
+                      title={t("actions.done")}
+                    >
+                      <Check className="h-4 w-4" />
+                      <span>{t("actions.done")}</span>
+                    </button>
+                  </div>
+                ))}
               </div>
             ) : (
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground py-3">
                 {t("dashboard.no_active")}
+              </div>
+            )}
+            {activeTasks.length > 3 && (
+              <div className="flex justify-end pt-3">
+                <Link
+                  to="/board"
+                  className="text-xs font-medium text-primary hover:text-primary/80"
+                >
+                  {t("dashboard.show_full_list")}
+                </Link>
               </div>
             )}
           </div>

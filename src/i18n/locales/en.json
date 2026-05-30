@@ -31,6 +31,8 @@
     "items_other": "items",
     "nothing_today": "No tasks for today. Enjoy the calm!",
     "currently_active": "Currently active task",
+    "active_tasks": "Currently active tasks",
+    "show_full_list": "All →",
     "no_active": "No active task. Pick one to focus on.",
     "this_week": "This week"
   },
@@ -56,7 +58,9 @@
   },
   "actions": {
     "add": "Add",
-    "mark_as_done": "Mark as done",
+    "mark_as_done": "Mark as\ndone",
+    "mark_as": "Mark as",
+    "done": "Done",
     "view_all": "View all",
     "whats_next": "What's next",
     "open": "Open →"
