@@ -21,8 +21,8 @@ export type Status = Task["status"];
 export interface Category {
   id: string;
   name: string;
-  color: string; // oklch or token name
-  icon?: string; // lucide icon name
+  color: string;
+  icon?: string;
 }
 
 export const DEFAULT_CATEGORIES: Category[] = [
