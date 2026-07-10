@@ -2,7 +2,7 @@
 
 **A modern full-stack task management web application** built with React 19, TypeScript, and TanStack Start. Developed as a bachelor's thesis project, Smart Task Planner demonstrates a production-grade approach to state management, UI architecture, and internationalization in a real-world SPA.
 
-🔗 **Live Demo:** [linarayven.github.io/bakalavrska-robota-zhdanova](https://linarayven.github.io/bakalavrska-robota-zhdanova)
+> 🚧 Live demo link will be added once deployment is finalized. See [Running Locally](#running-locally) below.
 
 ---
 
@@ -75,6 +75,24 @@ smart-task-planner/
 ├── wrangler.toml           # Cloudflare deployment configuration
 └── vite.config.ts
 ```
+
+---
+
+## Running Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/linarayven/bakalavrska-robota-zhdanova.git
+cd bakalavrska-robota-zhdanova
+
+# Install dependencies
+bun install
+
+# Start the dev server
+bun dev
+```
+
+The app will be available at `http://localhost:5173` (or the port shown in your terminal).
 
 ---
 
